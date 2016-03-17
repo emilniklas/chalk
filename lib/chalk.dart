@@ -23,19 +23,19 @@ Future<Null> compile(File template, {Directives directives}) async {
   await templatesFile.writeAsString(
     templateFiles.map((f) {
       final name = _name(f);
-      return 'import "templates/$name" as $name;';
+      return 'import "templates/$name.dart" as \$$name;';
     }).join() +
     'final templates = {' +
     templateFiles.map((f) {
       final name = _name(f);
-      return "#$name: $name.\$,";
+      return "#\$$name: (_) => new \$$name.\$(_),";
     }).join() +
     '};'
   );
 }
 
-Stream<String> render(File template) {
-  return gen.templates[_symbol(template)].render();
+Stream<String> render(File template, {Map<String, dynamic> locals: const {}}) {
+  return gen.templates[_symbol(template)](locals).render();
 }
 
 String _name(File file) {

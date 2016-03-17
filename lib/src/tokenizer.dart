@@ -46,7 +46,7 @@ class _Tokenizer {
     r'^\bimport\b': TokenType.importKeyword,
 
     r'^\s+': TokenType.whitespace,
-    
+
     r'^\{': TokenType.openCurly,
     r'^\}': TokenType.closeCurly,
     r'^\[': TokenType.openBracket,
