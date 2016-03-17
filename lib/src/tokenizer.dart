@@ -45,6 +45,8 @@ class _Tokenizer {
   static const patterns = const {
     r'^\bimport\b': TokenType.importKeyword,
 
+    r'^\s+': TokenType.whitespace,
+    
     r'^\{': TokenType.openCurly,
     r'^\}': TokenType.closeCurly,
     r'^\[': TokenType.openBracket,
@@ -88,6 +90,7 @@ class Token {
 
 enum TokenType {
   unknown,
+  whitespace,
   identifier,
   openCurly,
   closeCurly,
