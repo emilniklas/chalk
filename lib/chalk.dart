@@ -38,5 +38,5 @@ Stream<String> render(File template, {Map<String, dynamic> locals: const {}}) {
 }
 
 String _name(File file) {
-  return r'$' + BASE64.encode(file.absolute.path.codeUnits);
+  return r'template_' + BASE64.encode(file.absolute.path.codeUnits);
 }
