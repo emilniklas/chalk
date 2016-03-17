@@ -21,11 +21,14 @@ Future<Null> compile(File template, {Directives directives}) async {
     .where((f) => f is File && f.path.endsWith('.dart'));
 
   await templatesFile.writeAsString(
-    templateFiles.map((f) => 'import "${f.absolute.path}";').join() +
+    templateFiles.map((f) {
+      final name = _name(f);
+      return 'import "templates/$name" as $name;';
+    }).join() +
     'final templates = {' +
     templateFiles.map((f) {
       final name = _name(f);
-      return "#$name: $name.\$";
+      return "#$name: $name.\$,";
     }).join() +
     '};'
   );
