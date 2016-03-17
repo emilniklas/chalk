@@ -44,7 +44,7 @@ class Parser {
   Iterable<String> _markup() sync* {
     yield 'yield "';
     while (current != null) {
-      yield current.content;
+      yield current.content.replaceAll('\n', r'\n');
       offset++;
     }
     yield '";';
