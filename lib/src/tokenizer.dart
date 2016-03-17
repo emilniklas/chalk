@@ -43,6 +43,8 @@ class _Tokenizer {
   }
 
   static const patterns = const {
+    r'^\bimport\b': TokenType.importKeyword,
+
     r'^\{': TokenType.openCurly,
     r'^\}': TokenType.closeCurly,
     r'^\[': TokenType.openBracket,
@@ -88,6 +90,7 @@ enum TokenType {
   closeParen,
   backSlash,
   forwardSlash,
+  importKeyword,
 }
 
 class ScriptLocation {

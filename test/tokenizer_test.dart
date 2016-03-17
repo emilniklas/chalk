@@ -35,4 +35,9 @@ class TokenizerTest extends UnitTest {
     expectTokens('()', [TokenType.openParen, TokenType.closeParen]);
     expectTokens(r'\/', [TokenType.backSlash, TokenType.forwardSlash]);
   }
+
+  @test
+  keywords() {
+    expectToken('import', TokenType.importKeyword);
+  }
 }
