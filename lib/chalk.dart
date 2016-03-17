@@ -17,17 +17,16 @@ Future<Null> compile(File template, {Directives directives}) async {
   final templatesFile = new File(path.join(genDir, 'templates.dart'));
   final compiler = new Compiler(directives ?? new Directives());
   await templateFile.writeAsString(compiler.compile(await template.readAsString()));
-  final List<File> templateFiles = (await templatesDir.list().toList())
-    .where((f) => f is File && f.path.endsWith('.dart'));
+  final Iterable<String> templateFiles = (await templatesDir.list().toList())
+    .where((f) => f is File && f.path.endsWith('.dart'))
+    .map((f) => path.split(f.path).last.replaceFirst('.dart', ''));
 
   await templatesFile.writeAsString(
-    templateFiles.map((f) {
-      final name = _name(f);
+    templateFiles.map((name) {
       return 'import "templates/$name.dart" as \$$name;';
     }).join() +
     'final templates = {' +
-    templateFiles.map((f) {
-      final name = _name(f);
+    templateFiles.map((name) {
       return "#\$$name: (_) => new \$$name.\$(_),";
     }).join() +
     '};'
