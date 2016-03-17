@@ -10,5 +10,5 @@ compile(content) {
 }
 
 render() {
-  return gen.main();
+  return gen.templates[#some_id]();
 }
