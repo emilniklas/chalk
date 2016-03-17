@@ -29,6 +29,7 @@ class TokenizerTest extends UnitTest {
   allTokens() {
     expectToken('x', TokenType.identifier);
     expectToken('å', TokenType.unknown);
+    expectToken('"x"', TokenType.simpleString);
     expectTokens('{}', [TokenType.openCurly, TokenType.closeCurly]);
     expectTokens('[]', [TokenType.openBracket, TokenType.closeBracket]);
     expectTokens('<>', [TokenType.openAngle, TokenType.closeAngle]);

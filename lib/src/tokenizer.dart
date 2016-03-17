@@ -55,6 +55,7 @@ class _Tokenizer {
     r'^\>': TokenType.closeAngle,
     r'^\\': TokenType.backSlash,
     r'^\/': TokenType.forwardSlash,
+    r'^\".*?\"': TokenType.simpleString,
     r'^[a-zA-Z_$][a-zA-Z0-9_$]*': TokenType.identifier,
     r'^.': TokenType.unknown
   };
@@ -75,6 +76,14 @@ class Token {
         ? other.location == location
         : true;
   }
+
+  bool isA(TokenType type) {
+    return this.type == type;
+  }
+
+  bool isntA(TokenType type) {
+    return !isA(type);
+  }
 }
 
 enum TokenType {
@@ -91,6 +100,7 @@ enum TokenType {
   backSlash,
   forwardSlash,
   importKeyword,
+  simpleString,
 }
 
 class ScriptLocation {
