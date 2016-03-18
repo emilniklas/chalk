@@ -28,7 +28,9 @@ class ParserTest extends UnitTest {
   importStatement() {
     expectParsesWithImports([
       const Token(TokenType.importKeyword, 'import'),
+      const Token(TokenType.whitespace, ' '),
       const Token(TokenType.simpleString, '"x"'),
+      const Token(TokenType.whitespace, '\n\n'),
       const Token(TokenType.openAngle, '<'),
       const Token(TokenType.identifier, 'div'),
       const Token(TokenType.closeAngle, '>'),
@@ -36,11 +38,62 @@ class ParserTest extends UnitTest {
       const Token(TokenType.forwardSlash, '/'),
       const Token(TokenType.identifier, 'div'),
       const Token(TokenType.closeAngle, '>'),
+      const Token(TokenType.whitespace, '\n'),
     ],
       'import "x";'
       '$prefix'
       'yield "<div></div>";'
       '$suffix'
     );
+
+    expectParsesWithImports([
+      const Token(TokenType.importKeyword, 'import'),
+      const Token(TokenType.whitespace, ' '),
+      const Token(TokenType.simpleString, '"x"'),
+      const Token(TokenType.whitespace, ' '),
+      const Token(TokenType.asKeyword, 'as'),
+      const Token(TokenType.whitespace, ' '),
+      const Token(TokenType.identifier, 'thing'),
+      const Token(TokenType.whitespace, '\n'),
+      const Token(TokenType.importKeyword, 'import'),
+      const Token(TokenType.whitespace, ' '),
+      const Token(TokenType.simpleString, '"y"'),
+      const Token(TokenType.whitespace, ' '),
+      const Token(TokenType.asKeyword, 'as'),
+      const Token(TokenType.whitespace, ' '),
+      const Token(TokenType.identifier, 'thing2'),
+      const Token(TokenType.whitespace, '\n'),
+    ],
+      'import "x" as thing;'
+      'import "y" as thing2;'
+      '$prefix'
+      '$suffix'
+    );
+  }
+
+  @test
+  whitespaceHandling() {
+    expectParses([
+      const Token(TokenType.openAngle, '<'),
+      const Token(TokenType.identifier, 'div'),
+      const Token(TokenType.closeAngle, '>'),
+      const Token(TokenType.identifier, 'a'),
+      const Token(TokenType.identifier, ' '),
+      const Token(TokenType.identifier, 'b'),
+      const Token(TokenType.identifier, ' '),
+      const Token(TokenType.identifier, 'c'),
+      const Token(TokenType.openAngle, '<'),
+      const Token(TokenType.forwardSlash, '/'),
+      const Token(TokenType.identifier, 'div'),
+      const Token(TokenType.closeAngle, '>'),
+    ], 'yield "<div>a b c</div>";');
+  }
+
+  @test
+  variables() {
+    expectParses([
+      const Token(TokenType.dollarSign, r'$'),
+      const Token(TokenType.identifier, 'a'),
+    ], r'yield "${$_esc(a)}";');
   }
 }

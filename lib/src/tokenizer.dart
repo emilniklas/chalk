@@ -44,9 +44,12 @@ class _Tokenizer {
 
   static const patterns = const {
     r'^\bimport\b': TokenType.importKeyword,
+    r'^\bas\b': TokenType.asKeyword,
 
     r'^\s+': TokenType.whitespace,
 
+    r'^\;': TokenType.semicolon,
+    r'^\$': TokenType.dollarSign,
     r'^\{': TokenType.openCurly,
     r'^\}': TokenType.closeCurly,
     r'^\[': TokenType.openBracket,
@@ -86,6 +89,8 @@ class Token {
   bool isntA(TokenType type) {
     return !isA(type);
   }
+
+  static const eof = const Token(null, null);
 }
 
 enum TokenType {
@@ -102,7 +107,12 @@ enum TokenType {
   closeParen,
   backSlash,
   forwardSlash,
+  semicolon,
+  dollarSign,
+
   importKeyword,
+  asKeyword,
+  
   simpleString,
 }
 

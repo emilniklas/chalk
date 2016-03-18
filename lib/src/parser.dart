@@ -4,13 +4,23 @@ class Parser {
   final List<Token> source;
   int offset = 0;
 
-  Token get current => source.length > offset ? source[offset] : null;
+  Token get current => source.length > offset ? source[offset] : Token.eof;
 
   Parser(this.source);
 
   void expect(TokenType type) {
     if (current.isntA(type)) {
       throw new ParseError(current, 'Expected $type, but saw ${current.type}');
+    }
+  }
+
+  void movePastWhitespace() {
+    movePast(TokenType.whitespace);
+  }
+
+  void movePast(TokenType type) {
+    if (current.isA(type)) {
+      offset++;
     }
   }
 
@@ -25,29 +35,64 @@ class Parser {
       yield* _importStatement();
     }
     yield* prefix();
-    while (current != null) {
+    while (current.type != null) {
       yield* _markup();
     }
     yield* suffix();
   }
 
+  move() {
+    final c = current;
+    offset++;
+    return c;
+  }
+
   Iterable<String> _importStatement() sync* {
     expect(TokenType.importKeyword);
     yield 'import ';
-    offset++;
+    move();
+    movePastWhitespace();
     expect(TokenType.simpleString);
-    yield current.content;
+    yield move().content;
+    movePastWhitespace();
+    if (current.isA(TokenType.asKeyword)) {
+      move();
+      yield ' as ';
+      movePastWhitespace();
+      expect(TokenType.identifier);
+      yield move().content;
+    }
+    movePastWhitespace();
+    movePast(TokenType.semicolon);
     yield ';';
-    offset++;
   }
 
   Iterable<String> _markup() sync* {
     yield 'yield "';
-    while (current != null) {
-      yield current.content.replaceAll('\n', r'\n');
+    while (current.type != null) {
+      if (current.isA(TokenType.dollarSign)) {
+        offset++;
+        yield r'${$_esc(';
+        if (current.isA(TokenType.openCurly)) {
+          offset++;
+          yield* _expression();
+          expect(TokenType.closeCurly);
+          offset++;
+        } else {
+          expect(TokenType.identifier);
+          yield move().content;
+        }
+        yield ')}';
+      } else if (current.isntA(TokenType.whitespace)) {
+        yield current.content;
+      }
       offset++;
     }
     yield '";';
+  }
+
+  Iterable<String> _expression() sync* {
+    //
   }
 
   Iterable<String> prefix() sync* {
