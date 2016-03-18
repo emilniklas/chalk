@@ -7,7 +7,8 @@ import 'package:current_script/current_script.dart';
 import 'package:path/path.dart' as path;
 import 'compiler.dart';
 
-Future<Null> compile(File template, {Directives directives}) async {
+Future<Null> compile(String templatePath, {Directives directives}) async {
+  final template = new File(templatePath);
   final genDir = path.join(currentScript().parent.path, '_gen');
   final templatesDir = new Directory(path.join(genDir, 'templates'));
   if (!templatesDir.exists()) {
@@ -33,7 +34,8 @@ Future<Null> compile(File template, {Directives directives}) async {
   );
 }
 
-Stream<String> render(File template, {Map<String, dynamic> locals: const {}}) {
+Stream<String> render(String templatePath, {Map<String, dynamic> locals: const {}}) {
+  final template = new File(templatePath);
   final factory = gen.templates[_name(template)];
   if (factory is! Function) {
     throw new Exception('${template.path} is not compiled. Run `chalk.compile("${template.path}");` first!');
@@ -42,5 +44,5 @@ Stream<String> render(File template, {Map<String, dynamic> locals: const {}}) {
 }
 
 String _name(File file) {
-  return r'template_' + BASE64.encode(file.absolute.path.codeUnits);
+  return r'template_' + BASE64.encode(file.absolute.path.codeUnits).replaceAll('=', '_');
 }
