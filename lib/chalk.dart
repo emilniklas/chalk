@@ -34,7 +34,11 @@ Future<Null> compile(File template, {Directives directives}) async {
 }
 
 Stream<String> render(File template, {Map<String, dynamic> locals: const {}}) {
-  return gen.templates[_name(template)](locals).render();
+  final factory = gen.templates[_name(template)];
+  if (factory is! Function) {
+    throw new Exception('${template.path} is not compiled. Run `chalk.compile(${template.path})` first!');
+  }
+  return factory(locals).render();
 }
 
 String _name(File file) {
