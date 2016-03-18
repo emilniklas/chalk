@@ -36,7 +36,7 @@ Future<Null> compile(File template, {Directives directives}) async {
 Stream<String> render(File template, {Map<String, dynamic> locals: const {}}) {
   final factory = gen.templates[_name(template)];
   if (factory is! Function) {
-    throw new Exception('${template.path} is not compiled. Run `chalk.compile(${template.path})` first!');
+    throw new Exception('${template.path} is not compiled. Run `chalk.compile("${template.path}");` first!');
   }
   return factory(locals).render();
 }
