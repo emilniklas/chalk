@@ -36,7 +36,9 @@ class Parser {
     }
     yield* prefix();
     while (current.type != null) {
+      yield 'yield "';
       yield* _markup();
+      yield '";';
     }
     yield* suffix();
   }
@@ -68,8 +70,19 @@ class Parser {
   }
 
   Iterable<String> _markup() sync* {
-    yield 'yield "';
     while (current.type != null) {
+      if (current.isA(TokenType.backSlash)) {
+        move();
+        if (current.isA(TokenType.dollarSign)) {
+          move();
+          yield r'\$';
+        } else if (current.isA(TokenType.atSymbol)) {
+          move();
+          yield '@';
+        } else {
+          yield r'\\';
+        }
+      }
       if (current.isA(TokenType.dollarSign)) {
         offset++;
         yield r'${$_esc(';
@@ -83,16 +96,20 @@ class Parser {
           yield move().content;
         }
         yield ')}';
-      } else if (current.isntA(TokenType.whitespace)) {
-        yield current.content;
+        continue;
       }
+      if (current.type == null) {
+        break;
+      }
+      yield current.content.replaceAll('\n', r'\n');
       offset++;
     }
-    yield '";';
   }
 
   Iterable<String> _expression() sync* {
-    //
+    while (current.isntA(TokenType.closeCurly)) {
+      yield move().content;
+    }
   }
 
   Iterable<String> prefix() sync* {

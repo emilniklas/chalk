@@ -38,7 +38,6 @@ class ParserTest extends UnitTest {
       const Token(TokenType.forwardSlash, '/'),
       const Token(TokenType.identifier, 'div'),
       const Token(TokenType.closeAngle, '>'),
-      const Token(TokenType.whitespace, '\n'),
     ],
       'import "x";'
       '$prefix'
@@ -78,7 +77,7 @@ class ParserTest extends UnitTest {
       const Token(TokenType.identifier, 'div'),
       const Token(TokenType.closeAngle, '>'),
       const Token(TokenType.identifier, 'a'),
-      const Token(TokenType.identifier, ' '),
+      const Token(TokenType.whitespace, ' '),
       const Token(TokenType.identifier, 'b'),
       const Token(TokenType.identifier, ' '),
       const Token(TokenType.identifier, 'c'),
@@ -95,5 +94,27 @@ class ParserTest extends UnitTest {
       const Token(TokenType.dollarSign, r'$'),
       const Token(TokenType.identifier, 'a'),
     ], r'yield "${$_esc(a)}";');
+
+    expectParses([
+      const Token(TokenType.dollarSign, r'$'),
+      const Token(TokenType.openCurly, r'{'),
+      const Token(TokenType.identifier, 'a'),
+      const Token(TokenType.closeCurly, r'}'),
+    ], r'yield "${$_esc(a)}";');
+  }
+
+  @test
+  escapingSpecialSymbols() {
+    expectParses([
+      const Token(TokenType.backSlash, r'\'),
+      const Token(TokenType.dollarSign, r'$'),
+      const Token(TokenType.openCurly, r'{'),
+      const Token(TokenType.identifier, 'a'),
+      const Token(TokenType.closeCurly, r'}'),
+      const Token(TokenType.backSlash, r'\'),
+      const Token(TokenType.identifier, r'a'),
+      const Token(TokenType.backSlash, r'\'),
+      const Token(TokenType.atSymbol, r'@'),
+    ], r'yield "\${a}\\a@";');
   }
 }
