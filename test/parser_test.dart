@@ -4,29 +4,31 @@ export 'package:quark/init.dart';
 import 'package:chalk/src/parser.dart';
 import 'package:chalk/src/tokenizer.dart';
 
+import 'package:template_cache/cache.dart';
+
 const prefix = r'import "package:chalk/src/proxy_object.dart";class $ extends ProxyObject {$(_) : super(_);render() async* {';
 const suffix = '}}';
 
 class ParserTest extends UnitTest {
-  expectParses(List<Token> tokens, String output) {
-    expectParsesWithImports(tokens, '$prefix$output$suffix');
-  }
+  final Parser parser = new Parser();
 
-  expectParsesWithImports(List<Token> tokens, String output) {
-    expect(new Parser(tokens).parse().join(), output);
+  expectParses(List<Token> tokens, GeneratedTemplateCode output) {
+    final code = parser.parse(tokens);
+    expect(code.directives, 'import "package:chalk/src/_escape.dart";${output.directives}');
+    expect(code.renderBody, output.renderBody);
   }
 
   @test
   itWorks() {
-    expectParses([], '');
+    expectParses([], new GeneratedTemplateCode('', ''));
     expectParses([
       const Token(TokenType.identifier, 'x')
-    ], 'yield "x";');
+    ], new GeneratedTemplateCode('', 'yield "x";'));
   }
 
   @test
   importStatement() {
-    expectParsesWithImports([
+    expectParses([
       const Token(TokenType.importKeyword, 'import'),
       const Token(TokenType.whitespace, ' '),
       const Token(TokenType.simpleString, '"x"'),
@@ -39,13 +41,13 @@ class ParserTest extends UnitTest {
       const Token(TokenType.identifier, 'div'),
       const Token(TokenType.closeAngle, '>'),
     ],
-      'import "x";'
-      '$prefix'
-      'yield "<div></div>";'
-      '$suffix'
+      new GeneratedTemplateCode(
+        'import "x";',
+        'yield "<div></div>";'
+      )
     );
 
-    expectParsesWithImports([
+    expectParses([
       const Token(TokenType.importKeyword, 'import'),
       const Token(TokenType.whitespace, ' '),
       const Token(TokenType.simpleString, '"x"'),
@@ -63,10 +65,11 @@ class ParserTest extends UnitTest {
       const Token(TokenType.identifier, 'thing2'),
       const Token(TokenType.whitespace, '\n'),
     ],
-      'import "x" as thing;'
-      'import "y" as thing2;'
-      '$prefix'
-      '$suffix'
+      new GeneratedTemplateCode(
+        'import "x" as thing;'
+        'import "y" as thing2;',
+        ''
+      )
     );
   }
 
@@ -85,7 +88,7 @@ class ParserTest extends UnitTest {
       const Token(TokenType.forwardSlash, '/'),
       const Token(TokenType.identifier, 'div'),
       const Token(TokenType.closeAngle, '>'),
-    ], 'yield "<div>a b c</div>";');
+    ], new GeneratedTemplateCode('', 'yield "<div>a b c</div>";'));
   }
 
   @test
@@ -93,14 +96,14 @@ class ParserTest extends UnitTest {
     expectParses([
       const Token(TokenType.dollarSign, r'$'),
       const Token(TokenType.identifier, 'a'),
-    ], r'yield "${$_esc(a)}";');
+    ], new GeneratedTemplateCode('', r'yield "${$_esc(a)}";'));
 
     expectParses([
       const Token(TokenType.dollarSign, r'$'),
       const Token(TokenType.openCurly, r'{'),
       const Token(TokenType.identifier, 'a'),
       const Token(TokenType.closeCurly, r'}'),
-    ], r'yield "${$_esc(a)}";');
+    ], new GeneratedTemplateCode('', r'yield "${$_esc(a)}";'));
   }
 
   @test
@@ -115,6 +118,6 @@ class ParserTest extends UnitTest {
       const Token(TokenType.identifier, r'a'),
       const Token(TokenType.backSlash, r'\'),
       const Token(TokenType.atSymbol, r'@'),
-    ], r'yield "\${a}\\a@";');
+    ], new GeneratedTemplateCode('', r'yield "\${a}\\a@";'));
   }
 }

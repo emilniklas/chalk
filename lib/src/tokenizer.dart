@@ -48,7 +48,9 @@ class _Tokenizer {
 
     r'^\s+': TokenType.whitespace,
 
+    r'^\d+(?:\.\d+)?': TokenType.number,
     r'^\;': TokenType.semicolon,
+    r'^\+': TokenType.operator,
     r'^\@': TokenType.atSymbol,
     r'^\$': TokenType.dollarSign,
     r'^\{': TokenType.openCurly,
@@ -111,10 +113,12 @@ enum TokenType {
   semicolon,
   dollarSign,
   atSymbol,
+  operator,
+  number,
 
   importKeyword,
   asKeyword,
-  
+
   simpleString,
 }
 
@@ -129,6 +133,6 @@ class ScriptLocation {
         && other.line == line
         && other.char == char;
   }
-  
+
   String toString() => '$line:$char';
 }

@@ -1,12 +1,19 @@
+import 'package:template_cache/cache.dart';
 import 'tokenizer.dart';
 
 class Parser {
+  GeneratedTemplateCode parse(List<Token> tokens) {
+    return new _Parser(tokens).parse();
+  }
+}
+
+class _Parser {
   final List<Token> source;
   int offset = 0;
 
   Token get current => source.length > offset ? source[offset] : Token.eof;
 
-  Parser(this.source);
+  _Parser(this.source);
 
   void expect(TokenType type) {
     if (current.isntA(type)) {
@@ -24,29 +31,33 @@ class Parser {
     }
   }
 
-  Iterable<String> parse() sync* {
-    if (source.isEmpty) {
-      yield* prefix();
-      yield* suffix();
-      return;
-    }
-
-    while (current.isA(TokenType.importKeyword)) {
-      yield* _importStatement();
-    }
-    yield* prefix();
-    while (current.type != null) {
-      yield 'yield "';
-      yield* _markup();
-      yield '";';
-    }
-    yield* suffix();
+  GeneratedTemplateCode parse() {
+    return new GeneratedTemplateCode(
+      'import "package:chalk/src/_escape.dart";' +
+      _importStatements().join(),
+      _body().join()
+    );
   }
 
   move() {
     final c = current;
     offset++;
     return c;
+  }
+
+  Iterable<String> _body() sync* {
+    while (current.type != null) {
+      yield 'yield "';
+      yield* _markup().map((l) => l.replaceAll('\n', r'\n'));
+      yield '";';
+    }
+  }
+
+  Iterable<String> _importStatements() sync* {
+    movePastWhitespace();
+    while (current.isA(TokenType.importKeyword)) {
+      yield* _importStatement();
+    }
   }
 
   Iterable<String> _importStatement() sync* {
@@ -110,20 +121,6 @@ class Parser {
     while (current.isntA(TokenType.closeCurly)) {
       yield move().content;
     }
-  }
-
-  Iterable<String> prefix() sync* {
-    yield 'import "package:chalk/src/proxy_object.dart";';
-
-    yield r'class $ extends ProxyObject {';
-    yield r'$(_) : super(_);';
-
-    yield 'render() async* {';
-  }
-
-  Iterable<String> suffix() sync* {
-    yield '}';
-    yield '}';
   }
 }
 

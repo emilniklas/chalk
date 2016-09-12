@@ -35,10 +35,24 @@ class TokenizerTest extends UnitTest {
     expectTokens('<>', [TokenType.openAngle, TokenType.closeAngle]);
     expectTokens('()', [TokenType.openParen, TokenType.closeParen]);
     expectTokens(r'\/', [TokenType.backSlash, TokenType.forwardSlash]);
+    expectToken(r'3', TokenType.number);
+    expectToken(r'3.3', TokenType.number);
+    expectToken(r'312.312', TokenType.number);
   }
 
   @test
   keywords() {
     expectToken('import', TokenType.importKeyword);
+  }
+
+  @test
+  addition() {
+    expectTokens('3 + 3', [
+        TokenType.number,
+        TokenType.whitespace,
+        TokenType.operator,
+        TokenType.whitespace,
+        TokenType.number
+    ]);
   }
 }
