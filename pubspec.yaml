@@ -3,8 +3,7 @@ name: chalk
 version: 0.1.0
 
 dependencies:
-  template_cache:
-    git: https://github.com/dart-embla/template_cache.git
+  template_cache: ^0.1.1
 
 dev_dependencies:
   test: any
